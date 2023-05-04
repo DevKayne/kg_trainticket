@@ -5,10 +5,10 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
 -- Buy Ticket Machines -- 
-for _, TicketMachine in pairs(Config.BuyTicketLocations) do 
-    exports['qb-target']:AddBoxZone('ticketmachines', TicketMachine.x, TicketMachine.y, TicketMachine.z, 1.0, 0.2, {
+-- Strawberry Lower Machine --
+exports['qb-target']:AddBoxZone('ticketmachines', vector3(253.47, -1207.96, 29.29), 1.0, 0.2, {
         name = "ticketmachines",
-        heading = TicketMachine.w,
+        heading = 9.78,
         debugPoly = false,
     }, {
         options = {
@@ -16,27 +16,31 @@ for _, TicketMachine in pairs(Config.BuyTicketLocations) do
                 label = "Buy Ticket" .. "$ " .. Config.TicketPrice,
                 icon = "fas fa-ticket",
                 action = function(entity)
-                    local Player = QBCore.Functions.GetPlayer(entity)
-                    local Balance = Player.Functions.GetMoney('cash')
-                    if not Player then return end
-                    if Balance > Config.TicketPrice - 1 then 
-                        TriggerEvent('qb-trainticket:PurchaseTicket')
-                        Wait(100)
-                        QBCore.Functions.Notify('You have purchased a Ticket', 'success', 7000)
-                    else 
-                        QBCore.Functions.Notify("You have insufficient funds for a Ticket", 'error', 7000)
-                end,
-            }
+                    --     CheckBalance()
+                    --     TriggerEvent('qb-trainticket:PurchaseTicket')
+                    --     Wait(100)
+                    --     QBCore.Functions.Notify('You have purchased a Ticket', 'success', 7000)
+                    -- else 
+                    --     QBCore.Functions.Notify("You have insufficient funds for a Ticket", 'error', 7000)
+                    -- end 
+                    QBCore.Functions.TriggerCallback("qb-trainticket:CheckBalance", function(HasEnough)
+                        if HasEnough then 
+                           TriggerServerEvent('qb-trainticket:PurchaseTicket')
+                        else 
+                            QBCore.Functions.Notify("You have insufficient funds!", 'error', 5000)
+                        end
+                    end)
+                end 
+            },
         },
         distance = 2.5,
     })
-end 
 
 -- Tag On/Off Machines --
-for _, TagMachines in pairs(Config.MachineLocations) do 
-    exports['qb-target']:AddBoxZone("tagmachines", TagMachines.x, TagMachines.y, TagMachines.z, 1.0, 0.2, {
+-- Upper Strawberry --
+    exports['qb-target']:AddBoxZone("tagmachines",vector3(299.22, -1203.12, 38.89), 1.0, 0.2, {
         name = "tagmachines",
-        heading = TagMachines.w,
+        heading = 184.25,
         debugPoly = false,
     }, {
         options = {
@@ -51,9 +55,16 @@ for _, TagMachines in pairs(Config.MachineLocations) do
                         QBCore.Functions.Notify('You have Tagged Off!', 'success', 7000)
                     else 
                         QBCore.Functions.Notify('You have Tagged On', 'success', 7000)
+                        TaggedOn = true 
                     end 
+                end
             }
         },
         distance = 2.5,
     })
-end 
+
+RegisterCommand("test", function()
+    QBCore.Functions.TriggerCallback("qb-trainticket:CheckBalance", function(HasEnough)
+        print(HasEnough)
+    end)
+end)
