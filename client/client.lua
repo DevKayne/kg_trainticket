@@ -62,9 +62,3 @@ exports['qb-target']:AddBoxZone('ticketmachines', vector3(253.47, -1207.96, 29.2
         },
         distance = 2.5,
     })
-
-RegisterCommand("test", function()
-    QBCore.Functions.TriggerCallback("qb-trainticket:CheckBalance", function(HasEnough)
-        print(HasEnough)
-    end)
-end)
